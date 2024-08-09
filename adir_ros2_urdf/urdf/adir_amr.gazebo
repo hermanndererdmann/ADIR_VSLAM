@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+<robot name="adir_amr" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+<xacro:property name="body_color" value="Gazebo/Silver" />
+
+<gazebo>
+  <plugin name="control" filename="libgazebo_ros_control.so"/>
+</gazebo>
+<gazebo reference="base_chassis">
+  <material>${body_color}</material>
+  <mu1>1.0</mu1>
+  <mu2>1.0</mu2>
+  <self_collide>true</self_collide>
+  <gravity>true</gravity>
+</gazebo>
+
+<gazebo reference="front_left_wheel_1">
+  <material>${body_color}</material>
+  <mu1>10.0</mu1>
+  <mu2>5.0</mu2>
+  <self_collide>true</self_collide>
+</gazebo>
+
+<gazebo reference="rear_left_wheel_1">
+  <material>${body_color}</material>
+  <mu1>10.0</mu1>
+  <mu2>5.0</mu2>
+  <self_collide>true</self_collide>
+</gazebo>
+
+<gazebo reference="front_right_wheel_1">
+  <material>${body_color}</material>
+  <mu1>10.0</mu1>
+  <mu2>5.0</mu2>
+  <self_collide>true</self_collide>
+</gazebo>
+
+<gazebo reference="rear_right_wheel_1">
+  <material>${body_color}</material>
+  <mu1>10.0</mu1>
+  <mu2>5.0</mu2>
+  <self_collide>true</self_collide>
+</gazebo>
+ <gazebo>
+  <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <!-- <ros>
+          <namespace>$(arg robot_namespace)</namespace>
+          <remapping>cmd_vel:=cmd_vel</remapping>
+          <remapping>odom:=odom</remapping>
+      </ros> -->
+      <legacy_mode>false</legacy_mode>
+      <update_rate>100.0</update_rate>
+
+      <num_wheel_pairs>2</num_wheel_pairs>
+      <left_joint>Revolute 1</left_joint>
+      <left_joint>Revolute 2</left_joint>
+      <right_joint>Revolute 3</right_joint>
+      <right_joint>Revolute 4</right_joint>
+
+      <wheel_separation>${traction_track_width+traction_wheel_width-0.01}</wheel_separation>
+      <wheel_diameter>${2*traction_wheel_radius+0.01}</wheel_diameter>
+
+      <max_wheel_torque>${traction_max_wheel_torque}</max_wheel_torque>
+
+      <robot_base_frame>base_link</robot_base_frame>
+      <odometry_frame>odom</odometry_frame>
+    
+
+      <command_topic>cmd_vel</command_topic>
+      <odometry_topic>$(arg wheel_odom_topic)</odometry_topic>
+
+      <publish_odom_tf>$(arg publish_wheel_odom_tf)</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+      <publish_odom>true</publish_odom>
+
+      <max_wheel_acceleration>0.05</max_wheel_acceleration>
+      <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
+      <xacro:if value="${odometry_source == 'world'}">
+          <odometry_source>1</odometry_source>
+      </xacro:if>
+      <xacro:if value="${odometry_source == 'encoder'}">
+          <odometry_source>0</odometry_source>
+      </xacro:if>
+  </plugin>
+</gazebo>
+
+</robot>

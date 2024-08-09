@@ -1,0 +1,397 @@
+<?xml version="1.0" ?>
+<robot name="adir_amr" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!--................................ XACRO CONSTANTS .............................. -->
+
+    <xacro:property name="chassis_mass" value="70"/>
+    <xacro:property name="chassis_length" value="0.988"/>
+    <xacro:property name="chassis_width" value="0.392"/>
+    <xacro:property name="chassis_height" value="0.337"/>
+
+    <xacro:property name="traction_wheel_mass" value="1"/>
+    <xacro:property name="traction_wheel_base" value="0.88"/>
+    <xacro:property name="traction_max_wheel_torque" value="100"/>
+    <xacro:property name="traction_wheel_friction" value="1.0"/>
+
+    <xacro:property name="trolley_wheel_mass" value="0.1"/>
+    <xacro:property name="trolley_track_width" value="0.54"/>
+    <xacro:property name="trolley_wheel_friction" value="0.0"/>
+    <xacro:property name="trolley_wheel_radius" value="0.06"/>
+    <!-- a small constant -->
+    <xacro:property name="eps" value="0.002"/>
+
+    <xacro:property name="traction_wheel_radius" value="0.18"/>
+    <xacro:property name="traction_wheel_width" value="0.1"/>
+    <xacro:property name="traction_track_width" value="0.44"/>
+
+    <xacro:property name="two_d_lidar_update_rate" value="30"/>
+    <xacro:property name="two_d_lidar_sample_size" value="361"/>
+    <xacro:property name="two_d_lidar_min_angle" value="0"/>
+    <xacro:property name="two_d_lidar_max_angle" value="360"/>
+    <xacro:property name="two_d_lidar_min_range" value="0.55"/>
+    <xacro:property name="two_d_lidar_max_range" value="16"/>
+
+    <xacro:property name="camera_baseline" value="0.06"/>
+    <xacro:property name="camera_height" value="0.10"/>
+    <xacro:property name="camera_horizontal_fov" value="60"/>
+
+    <xacro:arg name="robot_namespace" default=""/>
+    <xacro:arg name="wheel_odom_topic" default="odom" />
+    <xacro:arg name="camera_enabled" default="false" />
+    <xacro:arg name="stereo_camera_enabled" default="false" />
+    <xacro:arg name="two_d_lidar_enabled" default="false" />
+    <xacro:arg name="publish_wheel_odom_tf" default="true" />
+    <xacro:arg name="conveyor_enabled" default="false"/>
+    <xacro:arg name="ground_truth_frame" default="map"/>
+    <xacro:arg name="sim_gazebo" default="false" />
+    <xacro:arg name="sim_gz" default="false" />
+    <xacro:arg name="odometry_source" default="world" />
+    <xacro:property name="M_PI"     value="3.1415926535897931" />
+    <xacro:property name="odometry_source" value="$(arg odometry_source)"/>
+
+    
+
+
+
+<xacro:include filename="$(find adir_amr_description)/urdf/materials.xacro" />
+<xacro:include filename="$(find adir_amr_description)/urdf/adir_amr.trans" />
+<xacro:include filename="$(find adir_amr_description)/urdf/adir_amr.gazebo" />
+<!-- <xacro:include filename="$(find adir_amr_description)/urdf/zed2i_macro.urdf.xacro" /> -->
+
+
+
+  <link name="base_link"/>
+
+  <link name="map"/>
+
+  <link name="odom"/>
+
+  <link name="base_chassis">
+    <inertial>
+      <origin xyz="0.01159211277265295 -6.802412947672323e-05 0.06459826101317201" rpy="0 0 0"/>
+      <mass value="363.52318655436534"/>
+      <inertia ixx="6.392363" iyy="25.21928" izz="29.411179" ixy="-0.000358" iyz="-3.3e-05" ixz="-0.016945"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="front_left_wheel_1">
+    <inertial>
+      <origin xyz="4.757305660518796e-14 0.07499977735987909 1.0609568779074152e-14" rpy="0 0 0"/>
+      <mass value="116.82215607805702"/>
+      <inertia ixx="1.147834" iyy="1.871225" izz="1.147834" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.3625 -0.219892 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/front_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.3625 -0.219892 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/front_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="rear_left_wheel_1">
+    <inertial>
+      <origin xyz="-7.432943149865423e-14 0.0749997773598747 8.88872309090516e-15" rpy="0 0 0"/>
+      <mass value="116.82215607805702"/>
+      <inertia ixx="1.147834" iyy="1.871225" izz="1.147834" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.3625 -0.219892 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/rear_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0.3625 -0.219892 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/rear_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="front_right_wheel_1">
+    <inertial>
+      <origin xyz="5.2735593669694936e-14 -0.07500022264012166 -7.809725088847586e-15" rpy="0 0 0"/>
+      <mass value="116.82215607805702"/>
+      <inertia ixx="1.147834" iyy="1.871225" izz="1.147834" ixy="0.0" iyz="0.0" ixz="0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.3625 0.220108 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/front_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.3625 0.220108 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/front_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="rear_right_wheel_1">
+    <inertial>
+      <origin xyz="-7.110978472724128e-14 -0.07500022264012526 -6.807054919732991e-15" rpy="0 0 0"/>
+      <mass value="116.82215607805702"/>
+      <inertia ixx="1.147834" iyy="1.871225" izz="1.147834" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.3625 0.220108 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/rear_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0.3625 0.220108 -0.03" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find adir_amr_description)/meshes/rear_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <!-- Define joint between map and odom -->
+  <joint name="map_to_odom" type="fixed">
+    <parent link="map"/>
+    <child link="odom"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Define joint between odom and base_link -->
+  <joint name="odom_to_base_link" type="fixed">
+    <parent link="odom"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_chassis"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="Revolute 1" type="continuous">
+    <origin xyz="0.3625 0.219892 0.03" rpy="0 0 0"/>
+    <parent link="base_chassis"/>
+    <child link="front_left_wheel_1"/>
+    <axis xyz="0.0 1.0 -0.0"/>
+  </joint>
+
+  <joint name="Revolute 2" type="continuous">
+    <origin xyz="-0.3625 0.219892 0.03" rpy="0 0 0"/>
+    <parent link="base_chassis"/>
+    <child link="rear_left_wheel_1"/>
+    <axis xyz="0.0 1.0 0.0"/>
+  </joint>
+
+  <joint name="Revolute 3" type="continuous">
+    <origin xyz="0.3625 -0.220108 0.03" rpy="0 0 0"/>
+    <parent link="base_chassis"/>
+    <child link="front_right_wheel_1"/>
+    <axis xyz="0.0 1.0 0.0"/>
+  </joint>
+
+  <joint name="Revolute 4" type="continuous">
+    <origin xyz="-0.3625 -0.220108 0.03" rpy="0 0 0"/>
+    <parent link="base_chassis"/>
+    <child link="rear_right_wheel_1"/>
+    <axis xyz="0.0 1.0 0.0"/>
+  </joint>
+
+
+
+ <!-- .............................STEREO CAMERA ........................................ -->
+    <xacro:property name="M_PI"     value="3.1415926535897931" />
+    <xacro:property name="baseline" value="0.12" />
+    <xacro:property name="height" value="0.1" />
+    <xacro:property name="bottom_slope" value="0.0" />
+    <xacro:property name="screw_offset_x" value="-0.01" />
+    <xacro:property name="screw_offset_z" value="0.0" />
+    <xacro:property name="optical_offset_x" value="-0.01" />
+    <xacro:property name ="camera_angle" value = "0.5235" />
+
+    <!-- Add one ZED Camera -->
+    <!-- <xacro:arg name="camera_name"   default="zed_front" />
+    <xacro:arg name="camera_model"  default="zed2i" /> 
+
+    <xacro:include filename="$(find zed_wrapper)/urdf/zed_macro.urdf.xacro" />
+    <xacro:zed_camera name="$(arg camera_name)" model="$(arg camera_model)">
+    </xacro:zed_camera>
+    <joint name="$(arg camera_name)_joint" type="fixed">
+      <origin xyz="0.12 0.0 0.25" rpy="0 0 0"/>
+      <parent link="base_chassis"/>
+      <child link="$(arg camera_name)_camera_link"/>
+    </joint> -->
+
+    
+    <!-- <xacro:if value="$(arg stereo_camera_enabled)">    -->
+    <link name="zed_front_camera_link" />
+    <link name="zed_rear_camera_link" />
+    
+    <!-- Camera Center -->
+    <link name="zed_front_camera_center">
+      <visual>
+        <origin xyz="${screw_offset_x} 0 ${screw_offset_z}" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="file://$(find adir_amr_description)/meshes/zed2i.stl" />
+        </geometry>
+        <material name="zed2i_mat" />
+      </visual>
+      <collision>
+        <origin xyz="${screw_offset_x} 0 ${screw_offset_z}" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="file://$(find adir_amr_description)/meshes/zed2i.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="zed_front_camera_center_joint" type="fixed">
+      <parent link="zed_front_camera_link"/>
+      <child link="zed_front_camera_center"/>
+      <origin xyz="0 0 ${height/2}" rpy="0 ${bottom_slope} 0" />
+    </joint>
+
+    <!-- Left Camera -->
+    <link name="zed_front_left_camera_frame" />
+    <joint name="zed_front_left_camera_joint" type="fixed">
+      <parent link="zed_front_camera_center"/>
+      <child link="zed_front_left_camera_frame"/>
+      <origin xyz="${optical_offset_x} ${baseline/2} 0" rpy="0 0 0" />
+    </joint>
+
+    <link name="zed_front_left_camera_optical_frame"/>
+    <joint name="zed_front_left_camera_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-${M_PI/2} 0.0 -${M_PI/2}"/>
+      <parent link="zed_front_left_camera_frame"/>
+      <child link="zed_front_left_camera_optical_frame"/>
+    </joint>
+
+    <!-- Right Camera -->
+    <link name="zed_front_right_camera_frame" />
+    <joint name="zed_front_right_camera_joint" type="fixed">
+      <parent link="zed_front_camera_center"/>
+      <child link="zed_front_right_camera_frame"/>
+      <origin xyz="${optical_offset_x} -${baseline/2} 0" rpy="0 0 0" />
+    </joint> 
+
+    <link name="zed_front_right_camera_optical_frame"/>
+    <joint name="zed_front_right_camera_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-${M_PI/2} 0.0 -${M_PI/2}"/>
+      <parent link="zed_front_right_camera_frame"/>
+      <child link="zed_front_right_camera_optical_frame"/>
+    </joint> 
+
+    <joint name ="zed_front_camera_link_to_base_link" type="fixed">
+        <origin xyz="${chassis_length*0.6} 0 ${chassis_height*0.3}" rpy="0 -${camera_angle} 0"/>
+        <parent link="base_chassis"/>
+        <child link="zed_front_camera_link"/>
+    </joint>
+
+    <joint name ="zed_rear_camera_link_to_base_link" type="fixed">
+        <origin xyz="-${chassis_length*0.6} 0 ${chassis_height*0.3}" rpy="0 -${camera_angle} ${M_PI}"/>
+        <parent link="base_chassis"/>
+        <child link="zed_rear_camera_link"/>
+    </joint>
+
+
+
+    
+
+<!-- 
+    ZED2 Sensors
+   
+      <link name="zed2i_mag_link" />
+      <joint name="zed2i_mag_joint" type="fixed">
+        <parent link="zed2i_camera_center"/>
+        <child link="zed2i_mag_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </joint>
+
+      <link name="zed2i_baro_link" />
+      <joint name="zed2i_baro_joint" type="fixed">
+        <parent link="zed2i_camera_center"/>
+        <child link="zed2i_baro_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </joint>
+
+      <link name="zed2i_temp_left_link" />
+      <joint name="zed2i_temp_left_joint" type="fixed">
+        <parent link="zed2i_left_camera_frame"/>
+        <child link="zed2i_temp_left_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </joint>
+
+      <link name="zed2i_temp_right_link" />
+      <joint name="zed2i_temp_right_joint" type="fixed">
+        <parent link="zed2i_right_camera_frame"/>
+        <child link="zed2i_temp_right_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </joint> -->
+
+      
+
+    <!-- </xacro:if> -->
+
+<!-- ............................. 2D LIDAR ........................................ -->
+
+    <!-- <xacro:if value="$(arg two_d_lidar_enabled)"> -->
+
+        <!-- <link name="two_d_lidar">
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="0.06" radius="0.075"/>
+                </geometry>
+            </collision>
+
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="0.06" radius="0.075"/>
+                </geometry>
+                <material name="aluminium"/>
+            </visual>
+
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <mass value="0.1"/>
+                <xacro:cylinder_inertia m="0.1" r="0.075" h="0.06"/>
+            </inertial>
+        </link>
+
+        <joint name="two_d_lidar_joint" type="fixed">
+            <parent link="base_link"/>
+            <child link="two_d_lidar"/>
+            <origin xyz="0.0 0 0.45" rpy="0 0 0" />
+        </joint>
+
+        <gazebo reference="two_d_lidar">
+            <material>Gazebo/White</material>
+        </gazebo>
+
+    </xacro:if> -->
+
+
+</robot>
